@@ -29,10 +29,11 @@ public class ItemFoundActivity extends Activity
 			Toast toast = Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
         	toast.show();
         	this.finish();
+        	return;
 		}
 		
        	TextView titleText = (TextView)findViewById(R.id.TitleText);
-   		titleText.setText(mMedia.getTitle());
+   		titleText.setText(String.valueOf(mMedia.getTitle()));
 		
 		final TextView ownedText = (TextView)findViewById(R.id.CopiesText);
 		ownedText.setText(Integer.toString(mMedia.getOwned()));

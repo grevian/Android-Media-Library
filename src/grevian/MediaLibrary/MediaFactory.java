@@ -39,7 +39,7 @@ public class MediaFactory {
 			// Look it up online, insert it into the SQL database cache if we successfully find it online too.
 			Log.w(TAG, "SQL Cache Miss for UPC: " + UPC);
 			Log.i(TAG, "Looking up UPC Online...");
-			String Title = UPCDataSource.getUPCText(UPC);
+			String Title = UPCDataSource.getUPCText(UPC).trim();			
 			Log.i(TAG, "UPC Lookup Result: " + Title);
 			
 			if ( Title == "" )

@@ -1,6 +1,7 @@
 package grevian.MediaLibrary;
 
 import android.database.sqlite.SQLiteCursor;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -38,7 +39,8 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 	@Override
 	public Object getItem(int position) {
 		_cursor.moveToPosition(position);
-		return _cursor.getString(0);
+		String[] Results = { _cursor.getString(0), _cursor.getString(2) };
+		return Results;
 	}
 
 	@Override
@@ -48,37 +50,43 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// If we already have a view component set here, just set it's text appropriately instead of recreating it
-		if ( convertView != null )
-		{
-			((TextView)convertView).setText((String)getItem(position));
-			return convertView;
-		}			
+		// if the existing view is null, create it as a textview
+		if ( convertView == null )
+			convertView = new TextView(parent.getContext());
 		
-		// Otherwise Create a textview with our value set, and return it
-		TextView mText = new TextView(parent.getContext());
-		mText.setText((String)getItem(position));
+		TextView mText = (TextView)convertView;
+		String[] vals = (String[])getItem(position);
+		mText.setText(vals[0]);
+		
+		if ( Integer.valueOf(vals[1]) > 0 )
+			mText.setTextColor(Color.GREEN);
+		else
+			mText.setTextColor(Color.RED);
+				
 		return mText;
 	}
  
 	@Override
 	public boolean onKey(View v, int keyCode, KeyEvent event) {
-		if ( _text.getText().toString().equalsIgnoreCase("") )
-		{
-			this.notifyDataSetInvalidated();
-			return false;
-		}
-		
+
 		// Time and execute the search query
 		long sTime = System.currentTimeMillis();
-		String[] Args = { "%" + _text.getText().toString() + "%" };
+
+		String[] Args;
+
+		// FIXME: Uuuugggghhh.
+		if ( _text.getText().toString().equalsIgnoreCase("") )
+			Args = new String[] { "QQQQQQQQQ" };
+		else
+			Args = new String[] { "%" + _text.getText().toString() + "%" };
+		
 		_cursor.setSelectionArguments(Args);
 		_cursor.requery();
+		// Probably not needed, but doesn't hurt
+		_cursor.moveToFirst();	
+		
 		long fTime = System.currentTimeMillis();		
 		Log.i(TAG, "Search for term '" + Args[0] + "' returned " + _cursor.getCount() + " results in " + (fTime-sTime) + "ms");
-		
-		// Probably not needed, but doesn't hurt
-		_cursor.moveToFirst();
 
 		this.notifyDataSetChanged();
 		return false;
