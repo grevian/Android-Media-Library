@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/DetailLayout"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TitleLabel" android:text="Title: "></TextView>
+<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/TitleLabel" android:id="@+id/LoanedLabel" android:text="Currently Loaned To: "></TextView><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/LoanedLabel" android:id="@+id/CopiesLabel" android:text="Copies Owned: "></TextView><Button android:layout_height="wrap_content" android:layout_below="@+id/CopiesLabel" android:id="@+id/AddButton" android:text="Add Copy to Collection" android:layout_width="fill_parent"></Button><Button android:layout_height="wrap_content" android:layout_below="@+id/AddButton" android:id="@+id/LoanButton" android:text="Loan Out Copy" android:layout_width="fill_parent"></Button><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/LoanedLabel" android:layout_toRightOf="@+id/CopiesLabel" android:id="@+id/CopiesText" android:text="0"></TextView><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/TitleLabel" android:layout_toRightOf="@+id/LoanedLabel" android:id="@+id/LoanedText" android:text="No one"></TextView><TextView android:layout_height="wrap_content" android:id="@+id/TitleText" android:layout_toRightOf="@+id/TitleLabel" android:layout_width="fill_parent" android:text="Unknown Title"></TextView>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</RelativeLayout>
