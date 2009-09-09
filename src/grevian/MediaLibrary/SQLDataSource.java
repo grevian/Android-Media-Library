@@ -1,7 +1,5 @@
 package grevian.MediaLibrary;
 
-import java.util.Random;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,23 +23,6 @@ public class SQLDataSource extends SQLiteOpenHelper {
 		// testInserts(this.getWritableDatabase());
 		itemDB = this.getReadableDatabase();
 		
-	}
-
-	@SuppressWarnings("unused")
-	private void testInserts(SQLiteDatabase writableDatabase) {
-		// String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX";
-		String characters = "abcde";
-		Random mRand = new Random();
-		
-		for ( int i = 0; i < 200; i++ )
-		{
-			StringBuffer mBuf = new StringBuffer();
-			for ( int p = 0; p < 10; p++ )
-			{
-				mBuf.append(characters.charAt(mRand.nextInt(characters.length())));
-			}
-			writableDatabase.execSQL("insert into " + DATABASE_SEARCH_TABLE + " (title, barcode) values ('"+mBuf.toString()+"', 123456789012)");
-		}
 	}
 
 	@Override
