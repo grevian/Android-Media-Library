@@ -1,7 +1,11 @@
 package grevian.MediaLibrary;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,18 +30,29 @@ public class ItemFoundActivity extends Activity
         	toast.show();
         	this.finish();
 		}
-				
 		
        	TextView titleText = (TextView)findViewById(R.id.TitleText);
    		titleText.setText(mMedia.getTitle());
 		
-   		/*
-		TextView ownedText = (TextView)findViewById(R.id.CopiesText);
-		ownedText.setText(mMedia.getOwned());
-   		 */
+		final TextView ownedText = (TextView)findViewById(R.id.CopiesText);
+		ownedText.setText(Integer.toString(mMedia.getOwned()));
    		
-		TextView loanedText = (TextView)findViewById(R.id.LoanedText);
-		loanedText.setText(mMedia.getLoaned());
+   		if ( mMedia.getLoaned() != "" )
+   		{
+   			TextView loanedText = (TextView)findViewById(R.id.LoanedText);
+   			loanedText.setText(mMedia.getLoaned());
+   		}
+		
+		// Set up the button to add copies
+		Button mButton = (Button)findViewById(R.id.AddButton);
+		mButton.setOnClickListener(		
+			new Button.OnClickListener() {
+		    public void onClick(View v) {
+		        mMedia.setOwned(mMedia.getOwned()+1);
+		        mMedia.save();
+		        ownedText.setText(Integer.toString(mMedia.getOwned()));
+		    }
+		});
 
 	}
 	

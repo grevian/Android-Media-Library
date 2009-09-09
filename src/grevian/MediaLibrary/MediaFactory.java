@@ -8,6 +8,7 @@ import android.util.Log;
 
 public class MediaFactory {
 	private final static String TAG = "GrevianMedia";
+	private static SQLDataSource mDataSource = null; 
 	
 	public static Media getMediaByUPC(Context mContext, String UPC) throws LookupException
 	{
@@ -15,7 +16,10 @@ public class MediaFactory {
 		Media mMedia = new Media();
 		
 		// Try a lookup in our local database first
-		SQLDataSource mDataSource = new SQLDataSource(mContext);
+		if ( mDataSource == null )
+			mDataSource = new SQLDataSource(mContext);
+		
+		mMedia.setDataSource(mDataSource);
 		SQLiteCursor mSearch = mDataSource.getBarcodeSearchCursor();
 		String[] mArgs = {UPC};
 		mSearch.setSelectionArguments(mArgs);
@@ -61,7 +65,7 @@ public class MediaFactory {
 		}
 
 		mSearch.close();
-		mDataSource.close();
+		// mDataSource.close();
 		
 		return mMedia;
 	}

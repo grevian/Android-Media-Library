@@ -47,7 +47,8 @@ public class SQLDataSource extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL("create table " + DATABASE_TABLE
-						+ "( barcode int(12), title varchar, owned int(2), summary varchar, year int(4)  ); ");
+						+ "( barcode integer primary key, title varchar, owned int(2), loaned varchar, summary varchar ); ");
+		
 	}
 
 	@Override
