@@ -39,7 +39,7 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 	@Override
 	public Object getItem(int position) {
 		_cursor.moveToPosition(position);
-		String[] Results = { _cursor.getString(0), _cursor.getString(2) };
+		String[] Results = { _cursor.getString(0), _cursor.getString(2), _cursor.getString(1) };
 		return Results;
 	}
 
@@ -65,10 +65,9 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 				
 		return mText;
 	}
- 
-	@Override
-	public boolean onKey(View v, int keyCode, KeyEvent event) {
-
+	
+	public boolean update()
+	{
 		// Time and execute the search query
 		long sTime = System.currentTimeMillis();
 
@@ -89,6 +88,12 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 		Log.i(TAG, "Search for term '" + Args[0] + "' returned " + _cursor.getCount() + " results in " + (fTime-sTime) + "ms");
 
 		this.notifyDataSetChanged();
+		return true;
+	}
+ 
+	@Override
+	public boolean onKey(View v, int keyCode, KeyEvent event) {
+		update();
 		return false;
 	}
 }

@@ -31,8 +31,14 @@ public class MediaLibrary extends Activity {
 		// Setup the searching field
 		searchCursor = mDataSource.getTitleSearchCursor();
 		this.startManagingCursor(searchCursor);
+		EditText searchText = (EditText) findViewById(R.id.SearchText);
+		mSearchAdapter = new SQLSearchAdapter(((ListView)findViewById(R.id.ResultList)), searchText, searchCursor);
 		
-		mSearchAdapter = new SQLSearchAdapter(((ListView)findViewById(R.id.ResultList)), (EditText) findViewById(R.id.SearchText), searchCursor);
+		if ( savedInstanceState != null && savedInstanceState.containsKey("searchText"))
+		{
+			searchText.setText(savedInstanceState.getString("searchText"));
+			mSearchAdapter.update();
+		}
 		
 		// Setup the scanner
 		Button mButton = (Button)findViewById(R.id.ScanButton);
@@ -50,28 +56,10 @@ public class MediaLibrary extends Activity {
 		mList.setOnItemClickListener(
 			new ListView.OnItemClickListener() {
 			public void onItemClick(AdapterView<?> ListContents, View mView, int position, long arg3) {
-				// TODO: A Direct lookup should be much simpler & Faster, we should be able to get a barcode from the list adapter...
-				SQLiteCursor mResultQuery = mDataSource.getTitleSearchCursor();
-				
-				String[] Args = { (String)ListContents.getItemAtPosition(position) };
-				mResultQuery.setSelectionArguments(Args);
-				mResultQuery.requery();
-				mResultQuery.moveToFirst();
-				
-				if ( mResultQuery.getCount() > 1 || mResultQuery.getCount() <= 0 )
-				{
-					Toast toast = Toast.makeText(getApplicationContext(), "Error Opening Item.", Toast.LENGTH_LONG);
-		        	toast.show();
-		        	return;
-				}
-				else
-				{
-					String UPC = mResultQuery.getString(1);
-					mResultQuery.close();
-					Intent i = new Intent(MediaLibrary.this, grevian.MediaLibrary.ItemFoundActivity.class);
-		            i.putExtra("UPC", UPC );
-		            startActivity(i);
-				}				
+				String[] itemDetails = (String[])ListContents.getItemAtPosition(position);
+				Intent i = new Intent(MediaLibrary.this, grevian.MediaLibrary.ItemFoundActivity.class);
+		        i.putExtra("UPC", itemDetails[2] );
+		        startActivity(i);
 			}
 		});
 		
