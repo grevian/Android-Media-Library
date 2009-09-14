@@ -24,11 +24,9 @@ public class UPCDataSource {
 	    catch (Exception e)
 	    {
 	    	Log.e("GrevianMedia", e.getMessage());
-	    	return "Not Found.";
+	    	return "";
 	    }
 	    return text;
 	}
 
-
-	
 }
