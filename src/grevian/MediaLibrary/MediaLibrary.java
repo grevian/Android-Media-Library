@@ -2,7 +2,6 @@ package grevian.MediaLibrary;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,14 +9,14 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class MediaLibrary extends Activity {
-	
+
+	public static final String AUTHORITY = "grevian.MediaLibrary";
+
 	private final static String TAG = "GrevianMedia";
-	private SQLDataSource mDataSource;
-	private SQLiteCursor searchCursor;
-	private SQLSearchAdapter mSearchAdapter;
+
+	private TextSearchAdapter mSearchAdapter;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -25,14 +24,10 @@ public class MediaLibrary extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		Log.i(TAG, "Application Started.");
-		
-		mDataSource = new SQLDataSource(this.getBaseContext());
-	
+
 		// Setup the searching field
-		searchCursor = mDataSource.getTitleSearchCursor();
-		this.startManagingCursor(searchCursor);
 		EditText searchText = (EditText) findViewById(R.id.SearchText);
-		mSearchAdapter = new SQLSearchAdapter(((ListView)findViewById(R.id.ResultList)), searchText, searchCursor);
+		mSearchAdapter = new TextSearchAdapter(((ListView)findViewById(R.id.ResultList)), searchText, this.getContentResolver());
 		
 		if ( savedInstanceState != null && savedInstanceState.containsKey("searchText"))
 		{
@@ -56,9 +51,9 @@ public class MediaLibrary extends Activity {
 		mList.setOnItemClickListener(
 			new ListView.OnItemClickListener() {
 			public void onItemClick(AdapterView<?> ListContents, View mView, int position, long arg3) {
-				String[] itemDetails = (String[])ListContents.getItemAtPosition(position);
+				Media itemDetails = (Media)ListContents.getItemAtPosition(position);
 				Intent i = new Intent(MediaLibrary.this, grevian.MediaLibrary.ItemFoundActivity.class);
-		        i.putExtra("UPC", itemDetails[2] );
+		        i.putExtra("UPC", itemDetails.getUPC() );
 		        startActivity(i);
 			}
 		});

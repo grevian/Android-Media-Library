@@ -1,7 +1,10 @@
 package grevian.MediaLibrary;
 
+import android.content.ContentResolver;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -12,21 +15,26 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
+public class TextSearchAdapter extends BaseAdapter implements OnKeyListener {
 	
 	private final static String TAG = "GrevianMedia";
 	private ListView _list;
 	private EditText _text;
-	private SQLiteCursor _cursor;
+	private Uri _searchUri;
+	private ContentResolver cr;
+	private Cursor _cursor;
 	
-	public SQLSearchAdapter(ListView mList, EditText mText, SQLiteCursor query)
+	public TextSearchAdapter(ListView mList, EditText mText, ContentResolver contentResolver)
 	{	
+		cr = contentResolver;
+		
 		_list = mList;
 		_text = mText;
-		_cursor = query;
-		String[] Args = { _text.getText().toString() };
-		_cursor.setSelectionArguments(Args);
-		_cursor.requery();
+		
+		_searchUri = Media.SEARCH_URI;
+		Uri currentUri = _searchUri.buildUpon().appendPath( _text.getText().toString() ).build();
+		_cursor = cr.query(currentUri, null, null, null, null);
+		
 		_text.setOnKeyListener(this);
 		_list.setAdapter(this);
 	}
@@ -39,8 +47,7 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 	@Override
 	public Object getItem(int position) {
 		_cursor.moveToPosition(position);
-		String[] Results = { _cursor.getString(0), _cursor.getString(2), _cursor.getString(1) };
-		return Results;
+		return new Media(_cursor, cr);
 	}
 
 	@Override
@@ -55,10 +62,10 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 			convertView = new TextView(parent.getContext());
 		
 		TextView mText = (TextView)convertView;
-		String[] vals = (String[])getItem(position);
-		mText.setText(vals[0]);
+		Media mMedia = (Media)getItem(position);
+		mText.setText(mMedia.getTitle());
 		
-		if ( Integer.valueOf(vals[1]) > 0 )
+		if ( mMedia.getOwned() > 0 )
 			mText.setTextColor(Color.GREEN);
 		else
 			mText.setTextColor(Color.RED);
@@ -71,21 +78,15 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 		// Time and execute the search query
 		long sTime = System.currentTimeMillis();
 
-		String[] Args;
-
-		// FIXME: Uuuugggghhh.
-		if ( _text.getText().toString().equalsIgnoreCase("") )
-			Args = new String[] { "QQQQQQQQQ" };
-		else
-			Args = new String[] { "%" + _text.getText().toString() + "%" };
+		_cursor.close(); // Close the old cursor
+		Uri currentUri = _searchUri.buildUpon().appendPath( _text.getText().toString() ).build();
+		_cursor = cr.query(currentUri, null, null, null, null);
 		
-		_cursor.setSelectionArguments(Args);
-		_cursor.requery();
 		// Probably not needed, but doesn't hurt
 		_cursor.moveToFirst();	
 		
 		long fTime = System.currentTimeMillis();		
-		Log.i(TAG, "Search for term '" + Args[0] + "' returned " + _cursor.getCount() + " results in " + (fTime-sTime) + "ms");
+		Log.i(TAG, "Search for term '" + _text.getText().toString() + "' returned " + _cursor.getCount() + " results in " + (fTime-sTime) + "ms");
 
 		this.notifyDataSetChanged();
 		return true;
@@ -96,4 +97,5 @@ public class SQLSearchAdapter extends BaseAdapter implements OnKeyListener {
 		update();
 		return false;
 	}
+	
 }

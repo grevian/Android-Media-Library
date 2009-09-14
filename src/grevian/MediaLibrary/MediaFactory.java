@@ -1,73 +1,52 @@
 package grevian.MediaLibrary;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteCursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
 public class MediaFactory {
 	private final static String TAG = "GrevianMedia";
-	private static SQLDataSource mDataSource = null; 
 	
 	public static Media getMediaByUPC(Context mContext, String UPC) throws LookupException
 	{
-		// Create our new empty media object
-		Media mMedia = new Media();
+		Media mMedia = null;
+		ContentResolver cr = mContext.getContentResolver();
 		
-		// Try a lookup in our local database first
-		if ( mDataSource == null )
-			mDataSource = new SQLDataSource(mContext);
-		
-		mMedia.setDataSource(mDataSource);
-		SQLiteCursor mSearch = mDataSource.getBarcodeSearchCursor();
-		String[] mArgs = {UPC};
-		mSearch.setSelectionArguments(mArgs);
-		mSearch.requery();
-		
-		if ( mSearch.getCount() > 0 )
+		// Try to lookup the content with the CR first
+		Uri myItem = ContentUris.withAppendedId(Media.CONTENT_URI, Long.valueOf(UPC));
+		Cursor cur = cr.query(myItem, null, null, null, null);
+		if ( cur.getCount() > 0 )
 		{
-			mSearch.moveToFirst();
-			Log.i(TAG, "Successful SQL Search for UPC : " + UPC);
-			Log.i(TAG, "Got Title: " + mSearch.getString(0) );
-			mMedia.setTitle(mSearch.getString(0) );
-			mMedia.setUPC(UPC);
-			mMedia.setOwned(mSearch.getInt(2));
+			cur.moveToFirst();
+			mMedia = new Media(cur, cr);
 		}
-		else
-		{
-			// Look it up online, insert it into the SQL database cache if we successfully find it online too.
-			Log.w(TAG, "SQL Cache Miss for UPC: " + UPC);
-			Log.i(TAG, "Looking up UPC Online...");
-			String Title = UPCDataSource.getUPCText(UPC).trim();			
-			Log.i(TAG, "UPC Lookup Result: " + Title);
-			
-			if ( Title == "" )
-			{
-				mSearch.close();
-				mDataSource.close();
-				throw new LookupException("Could not find Title Anywhere!");
-			}
-	        	
-			mMedia.setOwned(0);
-			mMedia.setTitle(Title);
-			mMedia.setUPC(UPC);
-			
-			// FIXME: That's some pretty tight coupling ALL OVER here...
-			Log.i(TAG, "Inserting looked up result into Database for future reference...");
-			SQLiteDatabase mInsertDB = mDataSource.getWritableDatabase();
-			ContentValues mVals = new ContentValues();
-			mVals.put("title", mMedia.getTitle());
-			mVals.put("barcode", mMedia.getUPC());
-			mVals.put("owned", mMedia.getOwned());
-			mInsertDB.insertOrThrow("t_media", "", mVals);
-			
-		}
-
-		mSearch.close();
-		// mDataSource.close();
+		cur.close();
 		
-		return mMedia;
+		if ( mMedia != null )
+			return mMedia;
+		
+		// Look it up online, then insert it into the CR if we successfully find it 
+		Log.w(TAG, "ContentResolver Miss for UPC: " + UPC);
+		Log.i(TAG, "Looking up UPC Online...");
+		String Title = UPCDataSource.getUPCText(UPC).trim();			
+		Log.i(TAG, "UPC Lookup Result: " + Title);
+		
+		if ( Title == "" )
+			throw new LookupException("Could not find Title Anywhere!");
+	    
+		ContentValues mVals = new ContentValues();
+		mVals.put(Media.TITLE, Title);
+		mVals.put(Media.BARCODE, UPC);
+		mVals.put(Media.OWNED, 0);
+		mVals.put(Media.LOANED, "");
+		cr.insert(Media.CONTENT_URI, mVals);
+		
+		// Ok, Mobile platforms probably don't like recursion, but this really is the most graceful way to handle things...
+		return MediaFactory.getMediaByUPC(mContext, UPC);
 	}
 	
 }

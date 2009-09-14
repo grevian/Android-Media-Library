@@ -1,7 +1,10 @@
 package grevian.MediaLibrary;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,7 +25,7 @@ public class ItemFoundActivity extends Activity
 		extras = getIntent().getExtras();
 		
 		try {
-			mMedia = MediaFactory.getMediaByUPC(this.getBaseContext(), extras.getString("UPC"));
+				mMedia = MediaFactory.getMediaByUPC(this.getBaseContext(), extras.getString("UPC"));			
 		}
 		catch (LookupException e )
 		{

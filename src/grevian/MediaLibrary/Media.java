@@ -1,15 +1,39 @@
 package grevian.MediaLibrary;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 public class Media 
 {	
+    public static final Uri CONTENT_URI = Uri.parse("content://" + MediaLibrary.AUTHORITY + "/media");
+    public static final Uri SEARCH_URI = Uri.parse("content://" + MediaLibrary.AUTHORITY + "/search/");
+    public static final String CONTENT_TYPE = "vnd.android.cursor.dir/grevian.MediaLibrary.Media";
+    public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/grevian.MediaLibrary.Media";
+    
+    public static final String DEFAULT_SORT_ORDER = "title desc";    
+	public static final String BARCODE = "barcode";
+	public static final String TITLE = "title";
+	public static final String OWNED = "owned";	
+	public static final String LOANED = "LOANED";
+	
 	private String Title;
 	private String UPC;
 	private int Owned;
 	private String Loaned;
-	private SQLDataSource mDataSource;
+	
+	private ContentResolver cr;
+	
+	public Media(Cursor c, ContentResolver contentResolver)
+	{
+		setTitle(c.getString(c.getColumnIndexOrThrow("title")));
+		setUPC(c.getString(c.getColumnIndexOrThrow("barcode")));
+		setOwned(c.getInt(c.getColumnIndexOrThrow("owned")));
+		setLoaned(c.getString(c.getColumnIndexOrThrow("loaned")));
+		cr = contentResolver;
+	}
 	
 	public Media()
 	{
@@ -59,17 +83,13 @@ public class Media
 			return true;
 	}
 
-	public void setDataSource(SQLDataSource mDataSource) {
-		this.mDataSource = mDataSource;
-	}
-
 	public void save() {
-		SQLiteDatabase mInsertDB = mDataSource.getWritableDatabase();
 		ContentValues mVals = new ContentValues();
-		mVals.put("title", this.Title);
-		mVals.put("owned", this.Owned);
-		String[] wArgs = { this.UPC };
-		mInsertDB.update("t_media", mVals, "barcode = ?", wArgs);
+		mVals.put(Media.TITLE, this.Title);
+		mVals.put(Media.OWNED, this.Owned);
+		mVals.put(Media.BARCODE, this.UPC);
+		mVals.put(Media.LOANED, this.Loaned);
+		cr.update(Media.CONTENT_URI, mVals, Media.BARCODE + " = " + this.UPC, null);
 	}
 	
 }
