@@ -2,7 +2,6 @@ package grevian.MediaLibrary;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
