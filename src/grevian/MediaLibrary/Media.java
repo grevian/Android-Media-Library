@@ -35,22 +35,6 @@ public class Media
 		cr = contentResolver;
 	}
 	
-	public Media()
-	{
-		setTitle("");
-		setUPC("");
-		setOwned(0);
-		setLoaned("");
-	}
-	
-	public Media(String Title, String UPC, int Owned, String Loaned)
-	{
-		setTitle(Title);
-		setUPC(UPC);
-		setOwned(Owned);
-		setLoaned(Loaned);
-	}
-	
 	public void setTitle(String title) {
 		Title = title;
 	}
