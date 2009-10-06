@@ -12,7 +12,7 @@ public class Media
     public static final String CONTENT_TYPE = "vnd.android.cursor.dir/grevian.MediaLibrary.Media";
     public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/grevian.MediaLibrary.Media";
     
-    public static final String DEFAULT_SORT_ORDER = "title desc";    
+    public static final String DEFAULT_SORT_ORDER = "lower(title) ASC";    
 	public static final String BARCODE = "barcode";
 	public static final String TITLE = "title";
 	public static final String OWNED = "owned";	
