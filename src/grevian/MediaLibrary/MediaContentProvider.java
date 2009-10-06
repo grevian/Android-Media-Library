@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import java.util.Random;
 
 public class MediaContentProvider extends ContentProvider {
 
@@ -41,6 +42,48 @@ public class MediaContentProvider extends ContentProvider {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 			// TODO: Clear the DB every load for a clean DB for now.
 			// onUpgrade(this.getWritableDatabase(), 1, 2);
+			// insertRandomRows(30);
+		}
+
+		@SuppressWarnings("unused")
+		private void insertRandomRows(int entries) {
+			
+			// Initialize required objects
+			ContentValues values = new ContentValues();
+			String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			StringBuilder titleBuilder = new StringBuilder();
+			Random mRand = new Random();
+			
+			for (int i = 0; i < entries; i++ )
+			{
+				// Clear existing objects (Object creation is expensive, so avoid recreating them)
+				values.clear();
+				titleBuilder.delete(0, titleBuilder.length());
+				
+				// Stick a not really real barcode into the values
+				values.put("barcode", 10000+i);
+				
+				// about half and half for owned vs not owned
+				if ( Math.random() < 0.5 )
+					values.put("owned", 1);
+				else
+					values.put("owned", 0);
+				
+				// Loaned and Summary will always be empty for now,
+				values.put("loaned", "");
+				values.put("summary", "");
+				
+				// generate a random 20 character title from the allowable characters
+				for (int p = 0; p < 20; p++)
+				{
+					titleBuilder.append(chars.charAt(mRand.nextInt(chars.length())));
+				}
+				values.put("title", titleBuilder.toString());
+				
+				// Insert into the database
+				this.getWritableDatabase().insert(DATABASE_TABLE, null, values);
+			}
+			
 		}
 
 		@Override
@@ -67,7 +110,7 @@ public class MediaContentProvider extends ContentProvider {
 		mDataSource = new SQLDataSource(getContext());
 		return true;
 	}
-	
+
 	@Override	
 	public Uri insert(Uri uri, ContentValues initialValues) {
 		// Validate the requested uri
