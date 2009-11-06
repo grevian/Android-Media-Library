@@ -41,7 +41,7 @@ public class MediaLibrary extends Activity {
 			new Button.OnClickListener() {
 		    public void onClick(View v) {
 		        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-		        intent.putExtra("SCAN_MODE", "SCAN_MODE");
+		        intent.putExtra("SCAN_MODE", "ONE_D_MODE");
 		        startActivityForResult(intent, 0);
 		    }
 		});
